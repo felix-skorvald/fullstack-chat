@@ -1,5 +1,21 @@
+import { useNavigate } from "react-router";
+import "./Header.css";
+import back from "../img/back.svg";
+
 const Header = () => {
-    return <div></div>;
+    const handleBack = () => {
+        navigate("/");
+    };
+
+    const navigate = useNavigate();
+    return (
+        <header>
+            <button onClick={handleBack}>
+                <img src={back} alt="" />
+            </button>
+            <h1>Chappy</h1>
+        </header>
+    );
 };
 
 export default Header;

@@ -1,0 +1,11 @@
+header {
+    background-color: #515378;
+    margin: 0;
+    display: flex;
+    width: 100%;
+
+    button {
+        padding: 0;
+        box-shadow: none;
+    }
+}

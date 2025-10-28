@@ -1,0 +1,46 @@
+.login-page {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    align-items: center;
+
+    .tabs {
+        display: flex;
+        justify-content: space-around;
+
+        .tab-button {
+            flex-grow: 1;
+            background-color: #343653;
+            border: none;
+            box-shadow: none;
+            transform: none;
+            border-radius: 0 10px 0 0;
+        }
+
+        .tab-button:first-child {
+            border-radius: 10px 0 0 0;
+        }
+
+        .tab-button:disabled {
+            background-color: #414368;
+        }
+    }
+
+    .title {
+        background-color: #515378;
+        margin: 1rem;
+        border-radius: 10px;
+        box-shadow: 0px 4px 0px 0px rgba(0, 0, 0, 0.5);
+        padding: 1rem;
+        h2 {
+            color: #414368;
+        }
+    }
+
+    .login.container {
+        display: flex;
+        flex-direction: column;
+        padding: 1rem;
+    }
+}

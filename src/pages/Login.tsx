@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router";
+import "./Login.css";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -9,8 +10,26 @@ export default function Login() {
 
     return (
         <div className="login-page">
-            <h1>Logga in</h1>
-            <button onClick={handleLogin}>Logga in</button>
+            <div className="container">
+                <div className="title">
+                    <h2>CHAPPY</h2>
+                </div>
+            </div>
+            <div className="container">
+                <div className="tabs">
+                    <button disabled className="tab-button">
+                        LOGGA IN
+                    </button>
+                    <button className="tab-button">REGISTRERA</button>
+                </div>
+                <div className="login container">
+                    <input type="text" placeholder="Användarnamn" />
+                    <input type="password" placeholder="Lösenord" />
+                    <button disabled>LOGGA IN</button>
+
+                    <button onClick={handleLogin}>Fortsätt som Gäst</button>
+                </div>
+            </div>
         </div>
     );
 }
