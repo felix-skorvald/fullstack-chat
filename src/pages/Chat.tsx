@@ -6,7 +6,13 @@ const Chat = () => {
         username: string;
         userId: string;
     }
+    interface ChannelResponse {
+        username: string;
+        userId: string;
+    }
     const [users, setUsers] = useState<UserResponse[]>([]);
+    const [channels, setChannels] = useState<ChannelResponse[]>([]);
+
     const getAllUsers = async () => {
         // Obs! Response i frontend är inte samma sak som Response i Express!
         const response: Response = await fetch("/api/users");

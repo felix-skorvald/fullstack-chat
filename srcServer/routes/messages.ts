@@ -7,6 +7,10 @@ import type { SendMessageBody, Message } from "../data/types.js";
 
 const router: Router = express.Router();
 
+interface IdParam {
+    id: string;
+}
+
 router.post(
     "/",
     async (
@@ -60,4 +64,8 @@ router.post(
     }
 );
 
+router.get(
+    "/:id",
+    async (req: Request<IdParam>, res: Response<Message[] | string>) => {}
+);
 export default router;
