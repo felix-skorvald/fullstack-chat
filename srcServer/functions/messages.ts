@@ -1,20 +1,19 @@
 import { db } from "../data/dynamoDb.js";
-import { QueryCommand } from "@aws-sdk/client-dynamodb";
+import { QueryCommand } from "@aws-sdk/lib-dynamodb";
 
 async function getChannelMessages(channelId: string) {
     const command = new QueryCommand({
         TableName: "Chappy",
-        KeyConditionExpression: "pk = :pk",
-        FilterExpression: "receiverId = :channelId",
+        KeyConditionExpression: "pk = :pk AND begins_with(sk, :skPrefix)",
         ExpressionAttributeValues: {
-            ":pk": { S: "MESSAGE" },
-            ":channelId": { S: channelId },
+            ":pk": "MESSAGE",
+            ":skPrefix": `MESSAGE#` + `#RIV#USER#${channelId}`,
         },
         ScanIndexForward: true,
     });
 
     const res = await db.send(command);
-    return res.Items;
+    return res.Items ?? [];
 }
 
 async function getDMs(userA: string, userB: string) {

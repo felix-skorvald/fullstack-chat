@@ -1,9 +1,11 @@
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import express from "express";
 import type { Router, Request, Response } from "express";
 import { db, tableName } from "../data/dynamoDb.js";
 import { createToken } from "../data/auth.js";
 import type { SendMessageBody, Message } from "../data/types.js";
+import { getDMs, getChannelMessages } from "../functions/messages.js";
+import { messageSchema, messagesSchema } from "../data/validation.js";
 
 const router: Router = express.Router();
 
@@ -30,12 +32,10 @@ router.post(
         const timestamp = now.toISOString();
 
         const newSk =
-            "MESSAGE#" +
-            newId +
+            "RID#USER#" +
+            body.receiverId +
             "#SID#USER#" +
             body.senderId +
-            "#RIV#USER#" +
-            body.receiverId +
             "#TIME#" +
             timeKey;
 
@@ -47,6 +47,7 @@ router.post(
             timestamp: timestamp,
             pk: "MESSAGE",
             sk: newSk,
+            //lägg till messageid
         };
 
         const command = new PutCommand({
@@ -64,8 +65,36 @@ router.post(
     }
 );
 
+// router.get(
+//     "user/:id",
+//     async (req: Request<IdParam>, res: Response<Message[] | string>) => { 
+//         getDMs()
+//     }
 router.get(
-    "/:id",
-    async (req: Request<IdParam>, res: Response<Message[] | string>) => {}
+    "/channel/:idParam",
+    async (req: Request<{ idParam: string }>, res: Response) => {
+        const receiverId = req.params.idParam;
+
+        const params = {
+            TableName: tableName,
+            KeyConditionExpression: "pk = :pk AND begins_with(sk, :skPrefix)",
+            ExpressionAttributeValues: {
+                ":pk": "MESSAGE",
+                ":skPrefix": `RID#USER#${receiverId}`,
+            },
+        };
+
+        try {
+            const result = await db.send(new QueryCommand(params));
+            res.send(result.Items || []);
+        } catch (error) {
+            console.log("GET channel fel:", (error as any)?.message);
+            res.status(500).send("Error i servern");
+        }
+    }
 );
+
+export { router };
+
+
 export default router;
