@@ -15,12 +15,13 @@ export interface LoginResponse {
 
 export interface Message {
     pk: string;
-    sk: string; // "MESSAGE#1#SID#USER#1#RID#USER#2#TIME#..."
+    sk: string;
     message: string;
     senderId: string;
-    receiverId: string; // "USER#2" eller "CHANNEL#1"
+    receiverId: string;
     senderName: string;
     timestamp: string;
+    messageId: string;
 }
 
 export interface SendMessageBody {
@@ -48,4 +49,9 @@ export interface UserItem {
     username: string;
     password: string;
     accessLevel: string;
+}
+
+export interface ErrorResponse {
+    sucess: boolean;
+    message: string;
 }

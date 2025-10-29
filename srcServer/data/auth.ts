@@ -9,6 +9,7 @@ function createToken(userId: string, accessLevel: String): string {
     return jwt.sign(
         {
             userId: userId,
+            accessLevel,
             exp: defaultExpiration,
         },
         jwtSecret

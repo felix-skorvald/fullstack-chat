@@ -3,8 +3,10 @@ import express from "express";
 import type { Router, Request, Response } from "express";
 import { db, tableName } from "../data/dynamoDb.js";
 import { createToken } from "../data/auth.js";
-import type { JwtResponse, UserBody } from "../data/types.js";
+import type { JwtResponse, UserBody, ErrorResponse } from "../data/types.js";
 import { genSalt, hash } from "bcrypt";
+import z from "zod";
+import { signInSchema } from "../data/validation.js";
 
 const router: Router = express.Router();
 
@@ -12,9 +14,8 @@ router.post(
     "/",
     async (
         req: Request<{}, JwtResponse, UserBody>,
-        res: Response<JwtResponse>
+        res: Response<JwtResponse | ErrorResponse>
     ) => {
-        //ZOD
         const body: UserBody = req.body;
         console.log("body", body);
 
@@ -33,13 +34,21 @@ router.post(
                 pk: "USER",
                 sk: "USER#" + newId,
             },
+            //ZOD
         });
         try {
             const result = await db.send(command);
             const token: string | null = createToken(newId, "user");
             res.send({ success: true, token: token });
         } catch (error) {
+            if (error instanceof z.ZodError) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Validation failed",
+                });
+            }
             console.log(`register.ts fel:`, (error as any)?.message);
+
             res.status(500).send({ success: false });
         }
     }

@@ -4,7 +4,6 @@ import type { Router, Request, Response } from "express";
 import { db, tableName } from "../data/dynamoDb.js";
 import { createToken } from "../data/auth.js";
 import type { SendMessageBody, Message } from "../data/types.js";
-import { getDMs, getChannelMessages } from "../functions/messages.js";
 import { messageSchema, messagesSchema } from "../data/validation.js";
 
 const router: Router = express.Router();
@@ -32,9 +31,9 @@ router.post(
         const timestamp = now.toISOString();
 
         const newSk =
-            "RID#USER#" +
+            "RID#" +
             body.receiverId +
-            "#SID#USER#" +
+            "#SID#" +
             body.senderId +
             "#TIME#" +
             timeKey;
@@ -47,7 +46,7 @@ router.post(
             timestamp: timestamp,
             pk: "MESSAGE",
             sk: newSk,
-            //lägg till messageid
+            messageId: newId,
         };
 
         const command = new PutCommand({
@@ -56,10 +55,9 @@ router.post(
         });
         try {
             const result = await db.send(command);
-            const token: string | null = createToken(newId, "user");
             res.send(message);
         } catch (error) {
-            console.log(`register.ts fel:`, (error as any)?.message);
+            console.log(`FEl med meddelande:`, (error as any)?.message);
             res.status(500).send("error i server");
         }
     }
@@ -67,20 +65,21 @@ router.post(
 
 // router.get(
 //     "user/:id",
-//     async (req: Request<IdParam>, res: Response<Message[] | string>) => { 
+//     async (req: Request<IdParam>, res: Response<Message[] | string>) => {
 //         getDMs()
 //     }
+
 router.get(
     "/channel/:idParam",
     async (req: Request<{ idParam: string }>, res: Response) => {
         const receiverId = req.params.idParam;
-
+        // Autetnisera if is private??
         const params = {
             TableName: tableName,
             KeyConditionExpression: "pk = :pk AND begins_with(sk, :skPrefix)",
             ExpressionAttributeValues: {
                 ":pk": "MESSAGE",
-                ":skPrefix": `RID#USER#${receiverId}`,
+                ":skPrefix": `RID#${receiverId}`,
             },
         };
 
@@ -93,8 +92,5 @@ router.get(
         }
     }
 );
-
-export { router };
-
 
 export default router;
