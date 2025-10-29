@@ -14,6 +14,7 @@ const Header = () => {
                 <img src={back} alt="" />
             </button>
             <h1>Chappy</h1>
+            <button>O</button>
         </header>
     );
 };

@@ -4,6 +4,7 @@
     flex-direction: column;
     justify-content: space-around;
     align-items: center;
+    padding: 1rem;
 
     .tabs {
         display: flex;

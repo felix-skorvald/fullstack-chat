@@ -19,7 +19,6 @@ const Chat = () => {
         const response: Response = await fetch("/api/users");
         const data = await response.json();
 
-        console.log("Data from server:", data);
         const userResponse: UserResponse[] = data;
         setUsers(userResponse);
     };
@@ -27,9 +26,6 @@ const Chat = () => {
         const response: Response = await fetch("/api/channel");
         const data = await response.json();
 
-        //  validera datan
-
-        console.log("Data from server:", data);
         const channelResponse: ChannelResponse[] = data;
         setChannels(channelResponse);
     };
