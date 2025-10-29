@@ -37,9 +37,15 @@ const Chat = () => {
 
     return (
         <div className="chat">
-            <button>Skapa ny kanal</button>
-            <a href="#">Logga in eller registrera dig.OBS</a>
-            <h2>Inloggad som Gäst</h2>
+            <div>
+                <div className="container">
+                    <h2>Inloggad som Gäst</h2>
+                    <a href="#">
+                        🆘 Logga in eller registrera dig för att skriva i låsta
+                        grupper eller skicka DMs
+                    </a>
+                </div>
+            </div>
             <h3>Kanaler</h3>
             <div className="groups container">
                 {channels.map((ch) => (
@@ -47,6 +53,7 @@ const Chat = () => {
                         <div> {ch.channelName} </div>
                     </button>
                 ))}
+                <button disabled>+ Skapa ny kanal</button>
             </div>
             <h3>DM</h3>
             <div className="dm container">

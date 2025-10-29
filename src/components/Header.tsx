@@ -1,6 +1,8 @@
 import { useNavigate } from "react-router";
 import "./Header.css";
 import back from "../img/back.svg";
+import user from "../img/user.svg";
+import { useHeaderStore } from "../data/headerStore";
 
 const Header = () => {
     const handleBack = () => {
@@ -13,8 +15,10 @@ const Header = () => {
             <button onClick={handleBack}>
                 <img src={back} alt="" />
             </button>
-            <h1>Chappy</h1>
-            <button>O</button>
+            <h3>ChappyTM</h3>
+            <button>
+                <img src={user} alt="" />
+            </button>
         </header>
     );
 };
