@@ -9,13 +9,15 @@ const Header = () => {
         navigate("/");
     };
 
+    const headerText = useHeaderStore((state) => state.headerText);
+
     const navigate = useNavigate();
     return (
         <header>
             <button onClick={handleBack}>
                 <img src={back} alt="" />
             </button>
-            <h3>ChappyTM</h3>
+            <h3>{headerText}</h3>
             <button>
                 <img src={user} alt="" />
             </button>

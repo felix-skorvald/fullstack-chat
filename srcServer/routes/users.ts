@@ -43,6 +43,38 @@ router.get("/", async (req, res: Response<void | UserResponse[]>) => {
     );
 });
 
+router.get(
+    "/:userId",
+    async (req: Request<UserIdParam>, res: Response<void | UserResponse>) => {
+        const userId = req.params.userId;
+        const sk = `USER#${userId}`;
+
+        const command = new QueryCommand({
+            TableName: tableName,
+            KeyConditionExpression: "pk = :pk AND sk = :sk",
+            ExpressionAttributeValues: {
+                ":pk": "USER",
+                ":sk": sk,
+            },
+            Limit: 1,
+        });
+
+        const output = await db.send(command);
+
+        if (!output.Items || output.Items.length === 0) {
+            res.sendStatus(404);
+            return;
+        }
+
+        const user: UserItem = output.Items[0] as UserItem;
+
+        res.send({
+            username: user.username,
+            userId: user.sk.substring(5),
+        });
+    }
+);
+
 interface Payload {
     userId: string;
     accessLevel: string;

@@ -47,7 +47,7 @@ export interface UserItem {
     pk: string;
     sk: string;
     username: string;
-    password: string;
+    passwordHash: string;
     accessLevel: string;
 }
 

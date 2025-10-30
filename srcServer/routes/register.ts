@@ -38,7 +38,11 @@ router.post(
         });
         try {
             const result = await db.send(command);
-            const token: string | null = createToken(newId, "user");
+            const token: string | null = createToken(
+                newId,
+                "user",
+                body.username
+            );
             res.send({ success: true, token: token });
         } catch (error) {
             if (error instanceof z.ZodError) {

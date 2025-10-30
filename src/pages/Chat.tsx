@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import "./Chat.css";
+import { useUserStore } from "../data/userStore";
+import { setUserFromToken } from "../data/login";
 
 const Chat = () => {
     interface UserResponse {
@@ -30,7 +32,11 @@ const Chat = () => {
         setChannels(channelResponse);
     };
 
+    const user = useUserStore((state) => state.username);
+    const token = localStorage.getItem("userToken");
+
     useEffect(() => {
+        setUserFromToken(token);
         getAllUsers();
         getAllChannels();
     }, []);
@@ -39,7 +45,11 @@ const Chat = () => {
         <div className="chat">
             <div>
                 <div className="container">
-                    <h2>Inloggad som Gäst</h2>
+                    {!token ? (
+                        <h2>Inlogggad som Gäst</h2>
+                    ) : (
+                        <h2>Välkommen {user}</h2>
+                    )}
                     <a href="#">
                         🆘 Logga in eller registrera dig för att skriva i låsta
                         grupper eller skicka DMs

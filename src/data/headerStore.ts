@@ -1,8 +1,11 @@
 import { create } from "zustand";
 
-const useHeaderStore = create((set) => ({
-    headerText: "P1",
-    setHeaderText: (headertext: string) => set({ headerText: headertext }),
-}));
+interface HeaderState {
+    headerText: string;
+    setHeaderText: (text: string) => void;
+}
 
-export { useHeaderStore };
+export const useHeaderStore = create<HeaderState>((set) => ({
+    headerText: "Chappy",
+    setHeaderText: (text) => set({ headerText: text }),
+}));
