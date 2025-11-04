@@ -8,6 +8,9 @@ const Header = () => {
     const handleBack = () => {
         navigate("/");
     };
+    const handleProfile = () => {
+        navigate("/profile");
+    };
 
     const headerText = useHeaderStore((state) => state.headerText);
 
@@ -18,7 +21,7 @@ const Header = () => {
                 <img src={back} alt="" />
             </button>
             <h3>{headerText}</h3>
-            <button>
+            <button onClick={handleProfile}>
                 <img src={user} alt="" />
             </button>
         </header>

@@ -16,33 +16,35 @@ router.post(
         req: Request<{}, JwtResponse, UserBody>,
         res: Response<JwtResponse | ErrorResponse>
     ) => {
-        const body: UserBody = req.body;
-        console.log("body", body);
-
-        const newId = crypto.randomUUID();
-
-        const salt: string = await genSalt();
-        const hashed: string = await hash(body.password, salt);
-
-        const command = new PutCommand({
-            TableName: tableName,
-            Item: {
-                username: body.username,
-                passwordHash: hashed,
-                accessLevel: "user",
-                userId: newId,
-                pk: "USER",
-                sk: "USER#" + newId,
-            },
-            //ZOD
-        });
         try {
+            const body: UserBody = signInSchema.parse(req.body);
+            console.log("body", body);
+
+            const newId = crypto.randomUUID();
+
+            const salt: string = await genSalt();
+            const hashed: string = await hash(body.password, salt);
+
+            const command = new PutCommand({
+                TableName: tableName,
+                Item: {
+                    username: body.username,
+                    passwordHash: hashed,
+                    accessLevel: "user",
+                    userId: newId,
+                    pk: "USER",
+                    sk: "USER#" + newId,
+                },
+                //ZOD
+            });
+
             const result = await db.send(command);
             const token: string | null = createToken(
                 newId,
                 "user",
                 body.username
             );
+            console.log(result);
             res.send({ success: true, token: token });
         } catch (error) {
             if (error instanceof z.ZodError) {

@@ -31,6 +31,14 @@ const newChannel = z.object({
     isPrivate: z.boolean(),
 });
 
+const userSchema = z.object({
+    pk: z.string().min(1),
+    sk: z.string().min(1),
+    username: z.string().min(1),
+    passwordHash: z.string().min(1),
+    accessLevel: z.string().min(1),
+});
+
 type Message = z.infer<typeof messageSchema>;
 
 type signInUser = z.infer<typeof signInSchema>;
@@ -40,9 +48,18 @@ type NewChannel = z.infer<typeof newChannel>;
 type Channel = z.infer<typeof channel>;
 
 const messagesSchema = z.array(messageSchema);
+const usersSchema = z.array(userSchema);
 
 type Messages = z.infer<typeof messagesSchema>;
 
-export { messageSchema, messagesSchema, signInSchema, newChannel, channel };
+export {
+    messageSchema,
+    messagesSchema,
+    signInSchema,
+    newChannel,
+    channel,
+    userSchema,
+    usersSchema,
+};
 
 export type { Message, Messages, NewChannel, Channel };

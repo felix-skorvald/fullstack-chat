@@ -1,7 +1,6 @@
 import { useNavigate } from "react-router";
 import "./Login.css";
 import { useState } from "react";
-import { setUserFromToken } from "../data/login";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -33,7 +32,6 @@ export default function Login() {
                     localStorage.setItem("userToken", data.token);
                     //Kanske använda token?
                     console.log(data.token);
-                    setUserFromToken(form.username);
                     navigate("/chat");
                 }
             }

@@ -4,6 +4,7 @@ import { db, tableName } from "../data/dynamoDb.js";
 import { DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import jwt from "jsonwebtoken";
 import type { UserItem } from "../data/types.js";
+import { usersSchema } from "../data/validation.js";
 
 const router: Router = express.Router();
 
@@ -32,7 +33,7 @@ router.get("/", async (req, res: Response<void | UserResponse[]>) => {
 
     // TODO: validera med zod att output.Items matchar UserItem-interfacet
     // OBS! Använd aldrig "as" i produktion - validera i stället!
-    const users: UserItem[] = output.Items as UserItem[];
+    const users: UserItem[] = usersSchema.parse(output.Items);
 
     // Frontend behöver bara användarnamn och id
     res.send(
