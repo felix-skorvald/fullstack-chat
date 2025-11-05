@@ -39,6 +39,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
         }
     };
 
+
     useEffect(() => {
         fetchMessages();
     }, [id]);
@@ -46,7 +47,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
     return (
         <div className="chat-view">
             {loading ? (
-                <p>Laddar meddelanden...</p>
+                <p>Laddar meddelanden... {chatName}{type}</p>
             ) : (
                 <div>
                     {messages.map((msg) => (
