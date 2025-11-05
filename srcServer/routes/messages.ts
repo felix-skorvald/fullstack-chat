@@ -2,15 +2,10 @@ import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import express from "express";
 import type { Router, Request, Response } from "express";
 import { db, tableName } from "../data/dynamoDb.js";
-import { createToken } from "../data/auth.js";
 import type { SendMessageBody, Message } from "../data/types.js";
 import { messageSchema, messagesSchema } from "../data/validation.js";
 
 const router: Router = express.Router();
-
-interface IdParam {
-    id: string;
-}
 
 router.post(
     "/",
@@ -62,12 +57,6 @@ router.post(
         }
     }
 );
-
-// router.get(
-//     "user/:id",
-//     async (req: Request<IdParam>, res: Response<Message[] | string>) => {
-//         getDMs()
-//     }
 
 router.get(
     "/channel/:idParam",

@@ -35,7 +35,6 @@ router.post(
                     pk: "USER",
                     sk: "USER#" + newId,
                 },
-                //ZOD
             });
 
             const result = await db.send(command);
@@ -53,7 +52,6 @@ router.post(
                     message: "Validation failed",
                 });
             }
-            console.log(`register.ts fel:`, (error as any)?.message);
 
             res.status(500).send({ success: false });
         }

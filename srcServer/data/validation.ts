@@ -16,7 +16,7 @@ const signInSchema = z.object({
     password: z.string().min(1),
 });
 
-const channel = z.object({
+const channelSchema = z.object({
     channelName: z.string().min(1),
     createdBy: z.string().min(1),
     isPrivate: z.boolean(),
@@ -25,7 +25,7 @@ const channel = z.object({
     channelId: z.string().min(1),
 });
 
-const newChannel = z.object({
+const newChannelSchema = z.object({
     channelName: z.string().min(1),
     createdBy: z.string().min(1),
     isPrivate: z.boolean(),
@@ -43,12 +43,13 @@ type Message = z.infer<typeof messageSchema>;
 
 type signInUser = z.infer<typeof signInSchema>;
 
-type NewChannel = z.infer<typeof newChannel>;
+type NewChannel = z.infer<typeof newChannelSchema>;
 
-type Channel = z.infer<typeof channel>;
+type Channel = z.infer<typeof channelSchema>;
 
 const messagesSchema = z.array(messageSchema);
 const usersSchema = z.array(userSchema);
+const channelsSchema = z.array(channelSchema);
 
 type Messages = z.infer<typeof messagesSchema>;
 
@@ -56,8 +57,9 @@ export {
     messageSchema,
     messagesSchema,
     signInSchema,
-    newChannel,
-    channel,
+    newChannelSchema,
+    channelSchema,
+    channelsSchema,
     userSchema,
     usersSchema,
 };
