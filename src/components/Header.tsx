@@ -21,6 +21,8 @@ const Header = () => {
 
     const headerText = useHeaderStore((state) => state.headerText);
 
+    //TODO en delad state för att BACKA!
+
     const navigate = useNavigate();
     return (
         <header>

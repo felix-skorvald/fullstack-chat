@@ -28,7 +28,10 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
         try {
             setLoading(true);
             const data = await getChannelMessages(id);
-            setMessages(data);
+            const sorted = data.sort((a, b) =>
+                a.timestamp.localeCompare(b.timestamp)
+            );
+            setMessages(sorted);
         } catch (error) {
             console.error("Fel vid hämtning av meddelanden:", error);
         } finally {
@@ -42,24 +45,19 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
 
     return (
         <div className="chat-view">
-            {type === "channel" ? (
-                <>
-                    <h2>{chatName}</h2>
-                </>
-            ) : (
-                <>
-                    <h2>{chatName}</h2>
-                    <p>Användar-ID: {id}</p>
-                </>
-            )}
             {loading ? (
                 <p>Laddar meddelanden...</p>
             ) : (
                 <div>
                     {messages.map((msg) => (
                         <div className="message" key={msg.messageId}>
-                            <strong>{msg.senderName}:</strong> {msg.message}{" "}
-                            {msg.timestamp}
+                            <p>
+                                <strong>{msg.senderName}:</strong>
+                            </p>
+                            <p>{msg.message}</p>
+                            <p>
+                                <i>{msg.timestamp}</i>
+                            </p>
                         </div>
                     ))}
                 </div>

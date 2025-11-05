@@ -14,6 +14,10 @@ header {
         box-shadow: none;
     }
 
+    button:disabled {
+        box-shadow: none;
+    }
+
     button:hover {
         transform: none;
         box-shadow: none;

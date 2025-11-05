@@ -1,10 +1,22 @@
 .chat-view {
-    padding-top: 6rem;
+    padding-top: 5rem;
+    padding-bottom: 5rem;
     position: relative;
     min-height: 100%;
+    z-index: -2;
     .message {
         padding: 1rem;
-        border-top: 1px solid white;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.5);
         text-align: start;
+        strong {
+            font-size: large;
+        }
+        p {
+            font-size: large;
+        }
+        i {
+            font-size: small;
+            color: rgba(255, 255, 255, 0.5);
+        }
     }
 }
