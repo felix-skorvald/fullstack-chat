@@ -5,6 +5,7 @@ import { DeleteCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import jwt from "jsonwebtoken";
 import type { UserItem } from "../data/types.js";
 import { usersSchema } from "../data/validation.js";
+import { validateJwt } from "../data/auth.js";
 
 const router: Router = express.Router();
 
@@ -30,12 +31,8 @@ router.get("/", async (req, res: Response<void | UserResponse[]>) => {
         res.status(500).send();
         return;
     }
-
-    // TODO: validera med zod att output.Items matchar UserItem-interfacet
-    // OBS! Använd aldrig "as" i produktion - validera i stället!
     const users: UserItem[] = usersSchema.parse(output.Items);
 
-    // Frontend behöver bara användarnamn och id
     res.send(
         users.map((ui) => ({
             username: ui.username,
@@ -79,29 +76,6 @@ router.get(
 interface Payload {
     userId: string;
     accessLevel: string;
-}
-
-function validateJwt(authHeader: string | undefined): Payload | null {
-    // 'Bearer: token'
-    if (!authHeader) {
-        return null;
-    }
-    const token: string = authHeader.substring(8);
-    try {
-        const decodedPayload: Payload = jwt.verify(
-            token,
-            process.env.JWT_SECRET || ""
-        ) as Payload;
-        // TODO: validera decodedPayload
-        const payload: Payload = {
-            userId: decodedPayload.userId,
-            accessLevel: decodedPayload.accessLevel,
-        };
-        return payload;
-    } catch (error) {
-        console.log("JWT verify failed: ", (error as any)?.message);
-        return null;
-    }
 }
 
 router.delete(

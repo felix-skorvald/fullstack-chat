@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { getChannelMessages } from "../data/getMessages";
+import { getChannelMessages, getUserMessages } from "../data/getMessages";
 import "./ChatView.css";
 import SendMessage from "./SendMessage";
 
@@ -26,8 +26,20 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
 
     const fetchMessages = async () => {
         try {
+            let data: Message[] = []
+
             setLoading(true);
-            const data = await getChannelMessages(id);
+            if (type === "dm") {
+                const token = localStorage.getItem("userToken")
+                if (!token) {
+                    console.error("Ingen token hittad");
+                    setLoading(false);
+                    return;
+                }
+                data = await getUserMessages(id, token);
+            } else if (type === "channel") {
+                data = await getChannelMessages(id);
+            }
             const sorted = data.sort((a, b) =>
                 a.timestamp.localeCompare(b.timestamp)
             );

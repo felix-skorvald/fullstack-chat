@@ -42,6 +42,13 @@ export interface JwtResponse {
     token?: string; // JWT
 }
 
+export interface Payload {
+    userId: string;
+    username: string;
+    accessLevel: string;
+    exp: number;
+}
+
 // Beskriver user-items från databasen
 export interface UserItem {
     pk: string;

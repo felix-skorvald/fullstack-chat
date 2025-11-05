@@ -10,9 +10,33 @@ interface Message {
 }
 
 export const getChannelMessages = async (channelId: String) => {
-    const response: Response = await fetch("/api/message/channel/" + channelId);
-    const data = await response.json();
+    try {
+        const response: Response = await fetch("/api/message/channel/" + channelId);
+        const data = await response.json();
 
-    const messages: Message[] = data;
-    return messages;
+        const messages: Message[] = data;
+        return messages;
+
+    } catch (error) {
+        console.error("Kunde inte hämta meddelanden:", error);
+        return [];
+    }
 };
+
+export const getUserMessages = async (receiverId: string, token: string) => {
+    try {
+        const response = await fetch("/api/message/user/" + receiverId, {
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer: ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        const messages = await response.json();
+        return messages;
+    } catch (error) {
+        console.error("Kunde inte hämta meddelanden:", error);
+        return [];
+    }
+}

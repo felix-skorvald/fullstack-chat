@@ -2,10 +2,13 @@ import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import express from "express";
 import type { Router, Request, Response } from "express";
 import { db, tableName } from "../data/dynamoDb.js";
-import type { SendMessageBody, Message } from "../data/types.js";
+import type { SendMessageBody, Message, Payload } from "../data/types.js";
 import { messageSchema, messagesSchema } from "../data/validation.js";
+import { validateJwt } from "../data/auth.js";
 
 const router: Router = express.Router();
+
+const jwtSecret: string = process.env.JWT_SECRET || "";
 
 router.post(
     "/",
@@ -77,6 +80,83 @@ router.get(
             res.send(result.Items || []);
         } catch (error) {
             console.log("GET channel fel:", (error as any)?.message);
+            res.status(500).send("Error i servern");
+        }
+    }
+);
+
+router.get(
+    "/user/:idParam",
+    async (req: Request<{ idParam: string }>, res: Response) => {
+        const receiverId = req.params.idParam;
+        const authHeader = req.header("authorization");
+
+        if (!authHeader) {
+            return res.status(401).send("Missing Authorization header");
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        if (!token) {
+            return res.status(401).send("Invalid Authorization header format");
+        }
+
+        try {
+            const maybePayload: Payload | null = validateJwt(req.headers['authorization'])
+            if (!maybePayload) {
+                console.log('Gick inte att validera JWT')
+                res.sendStatus(401)
+                return
+            }
+
+            const myId = maybePayload.userId;
+            const params1 = {
+                TableName: tableName,
+                KeyConditionExpression:
+                    "pk = :pk AND begins_with(sk, :skPrefix1)",
+                ExpressionAttributeValues: {
+                    ":pk": "MESSAGE",
+                    ":skPrefix1": `RID#${receiverId}#SID#${myId}`,
+                },
+            };
+
+            const params2 = {
+                TableName: tableName,
+                KeyConditionExpression:
+                    "pk = :pk AND begins_with(sk, :skPrefix2)",
+                ExpressionAttributeValues: {
+                    ":pk": "MESSAGE",
+                    ":skPrefix2": `RID#${myId}#SID#${receiverId}`,
+                },
+            };
+
+            const [result1, result2] = await Promise.all([
+                db.send(new QueryCommand(params1)),
+                db.send(new QueryCommand(params2)),
+            ]);
+
+            const allMessages = [
+                ...(result1.Items || []),
+                ...(result2.Items || []),
+            ];
+
+            allMessages.sort((a, b) =>
+                a.sk.localeCompare(b.sk, "en", { sensitivity: "base" })
+            );
+
+            const parsed = messagesSchema.safeParse(allMessages);
+            //Kör med z zoderror sen
+            if (!parsed.success) {
+
+                return res.status(500).send("Felaktigt meddelandeformat i databasen");
+            }
+
+            res.send(parsed.data);
+        } catch (error) {
+            if ((error as any).name === "JsonWebTokenError") {
+                return res.status(401).send("Invalid token");
+            }
+
             res.status(500).send("Error i servern");
         }
     }

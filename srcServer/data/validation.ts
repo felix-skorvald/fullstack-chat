@@ -39,6 +39,13 @@ const userSchema = z.object({
     accessLevel: z.string().min(1),
 });
 
+const payloadSchema = z.object({
+    userId: z.string(),
+    username: z.string(),
+    accessLevel: z.string(),
+    exp: z.number(),
+});
+
 type Message = z.infer<typeof messageSchema>;
 
 type signInUser = z.infer<typeof signInSchema>;
@@ -62,6 +69,7 @@ export {
     channelsSchema,
     userSchema,
     usersSchema,
+    payloadSchema
 };
 
 export type { Message, Messages, NewChannel, Channel };
