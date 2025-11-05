@@ -3,6 +3,7 @@ import "./Chat.css";
 import { useUserStore } from "../data/userStore";
 import { setUserFromToken } from "../data/login";
 import { useParams, useNavigate } from "react-router";
+import ChatView from "../components/ChatView";
 
 const Chat = () => {
     interface UserResponse {
@@ -17,8 +18,14 @@ const Chat = () => {
     }
 
     const navigate = useNavigate();
+    const { type, id } = useParams();
     const [users, setUsers] = useState<UserResponse[]>([]);
     const [channels, setChannels] = useState<ChannelResponse[]>([]);
+    const token = localStorage.getItem("userToken");
+    const user = {
+        username: useUserStore((state) => state.username),
+        accessLevel: useUserStore((state) => state.accessLevel),
+    };
 
     const getAllUsers = async () => {
         const response: Response = await fetch("/api/users");
@@ -34,44 +41,31 @@ const Chat = () => {
         const channelResponse: ChannelResponse[] = data;
         setChannels(channelResponse);
     };
-
-    const token = localStorage.getItem("userToken");
-    const user = {
-        username: useUserStore((state) => state.username),
-        accessLevel: useUserStore((state) => state.accessLevel),
-    };
-
-    const { type, id } = useParams();
-
     const openChat = (type: "channel" | "dm", id: string) => {
         navigate(`/chat/${type}/${id}`);
     };
 
     useEffect(() => {
         setUserFromToken(token);
+
         if (!type && !id) {
             getAllUsers();
             getAllChannels();
         }
-    }, [type, id]);
+    }, [type, id, token]);
 
     if (type && id) {
-        return (
-            <div className="chat-view">
-                <button onClick={() => navigate("/chat")}>⬅ Tillbaka</button>
-                {type === "channel" ? (
-                    <>
-                        <h2>Kanalchatt</h2>
-                        <p>Kanal-ID: {id}</p>
-                    </>
-                ) : (
-                    <>
-                        <h2>Direktmeddelande</h2>
-                        <p>Användar-ID: {id}</p>
-                    </>
-                )}
-            </div>
-        );
+        let chatName = "";
+
+        if (type === "channel") {
+            const channel = channels.find((ch) => ch.channelId === id);
+            chatName = channel ? channel.channelName : "Okänd kanal";
+        } else if (type === "dm") {
+            const dm = users.find((d) => d.userId === id);
+            chatName = dm ? dm.username : "Okänd användare";
+        }
+
+        return <ChatView type={type} id={id} chatName={chatName} />;
     }
 
     return (

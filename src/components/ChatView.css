@@ -1,0 +1,10 @@
+.chat-view {
+    padding-top: 6rem;
+    position: relative;
+    min-height: 100%;
+    .message {
+        padding: 1rem;
+        border-top: 1px solid white;
+        text-align: start;
+    }
+}
