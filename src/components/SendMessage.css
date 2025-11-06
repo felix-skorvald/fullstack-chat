@@ -15,6 +15,10 @@
         align-items: center;
         box-shadow: none;
     }
+
+    button:hover {
+        transform: none;
+    }
     textarea {
         font-weight: 500;
         border-radius: 10px;

@@ -9,24 +9,28 @@ interface TokenPayload {
 }
 
 export const setUserFromToken = (token: string | null) => {
-    const { setUsername, setAccessLevel } = useUserStore.getState();
+    const { setUsername, setAccessLevel, setUserId } = useUserStore.getState();
     const guestId = Math.floor(Math.random() * 1000);
+
+    const createGuest = () => {
+        const tempId = String(crypto.randomUUID);
+        setUsername("Gäst" + guestId);
+        setAccessLevel("guest");
+        setUserId(tempId);
+    };
     try {
         //VALIDERA TOEKEN?
         if (!token) {
-            setUsername("Gäst" + guestId);
-            setAccessLevel("guest");
-            console.log("finns ingen token");
+            createGuest();
+            console.log("finns ingen token" + guestId);
             return;
         }
         const decoded = jwtDecode<TokenPayload>(token);
         const nowInSeconds = Math.floor(Date.now() / 1000);
         if (decoded.exp && decoded.exp < nowInSeconds) {
             console.warn("Token har gått ut, rensar");
-            setUsername("Gäst" + guestId);
-            setAccessLevel("guest");
+            createGuest();
             localStorage.removeItem("userToken");
-            console.log(token);
             return;
         }
 
@@ -36,6 +40,9 @@ export const setUserFromToken = (token: string | null) => {
 
         if (decoded.accessLevel) {
             setAccessLevel(decoded.accessLevel);
+        }
+        if (decoded.userId) {
+            setUserId(decoded.userId);
         }
 
         console.log("Användare satt från token:", decoded);

@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { getChannelMessages, getUserMessages } from "../data/getMessages";
 import "./ChatView.css";
 import SendMessage from "./SendMessage";
@@ -23,14 +23,15 @@ interface ChatViewProps {
 const ChatView = ({ type, id, chatName }: ChatViewProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
+    const bottomRef = useRef<HTMLDivElement | null>(null);
 
     const fetchMessages = async () => {
         try {
-            let data: Message[] = []
+            let data: Message[] = [];
 
             setLoading(true);
             if (type === "dm") {
-                const token = localStorage.getItem("userToken")
+                const token = localStorage.getItem("userToken");
                 if (!token) {
                     console.error("Ingen token hittad");
                     setLoading(false);
@@ -51,15 +52,21 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
         }
     };
 
-
     useEffect(() => {
         fetchMessages();
     }, [id]);
 
+    useEffect(() => {
+        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+    }, [messages]);
+
     return (
         <div className="chat-view">
             {loading ? (
-                <p>Laddar meddelanden... {chatName}{type}</p>
+                <p>
+                    Laddar meddelanden... {chatName}
+                    {type}
+                </p>
             ) : (
                 <div>
                     {messages.map((msg) => (
@@ -73,9 +80,10 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
                             </p>
                         </div>
                     ))}
+                    <div ref={bottomRef} />
                 </div>
             )}
-            <SendMessage />
+            <SendMessage receiver={id} update={fetchMessages} />
         </div>
     );
 };

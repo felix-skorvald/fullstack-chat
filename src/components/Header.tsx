@@ -8,7 +8,7 @@ import { useUserStore } from "../data/userStore";
 
 const Header = () => {
     const handleBack = () => {
-        navigate("/");
+        navigate("/chat");
     };
     const handleProfile = () => {
         navigate("/profile");

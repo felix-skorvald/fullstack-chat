@@ -40,6 +40,33 @@ export default function Login() {
         }
     };
 
+    const handleRegister = async () => {
+        try {
+            const res = await fetch("/api/register", {
+                method: "POST",
+                body: JSON.stringify({
+                    username: form.username,
+                    password: form.password,
+                }),
+                headers: {
+                    "Content-type": "application/json",
+                },
+            });
+            const data = await res.json();
+            if (data.success) {
+                setMessage("Lyckades Regga användare");
+                if (data.token) {
+                    localStorage.setItem("userToken", data.token);
+                    //Kanske använda token?
+                    console.log(data.token);
+                    navigate("/chat");
+                }
+            }
+        } catch (err) {
+            console.error("Fel vid inloggning", err);
+        }
+    };
+
     const [register, setregister] = useState(false);
 
     return (
@@ -128,8 +155,15 @@ export default function Login() {
                                 setConfirmedPass(event.target.value)
                             }
                         />
-                        <button disabled>REGISTRERA DIG</button>
-                        <button onClick={handleLogin}>Fortsätt som Gäst</button>
+                        <button
+                            disabled={form.password !== confirmedPass}
+                            onClick={handleRegister}
+                        >
+                            REGISTRERA DIG
+                        </button>
+                        <button onClick={() => navigate("/chat")}>
+                            Fortsätt som Gäst
+                        </button>
                     </div>
                 )}
             </div>
