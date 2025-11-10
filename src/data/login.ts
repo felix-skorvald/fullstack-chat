@@ -23,7 +23,7 @@ export const setUserFromToken = (token: string | null) => {
         if (!token) {
             createGuest();
             console.log("finns ingen token" + guestId);
-            return;
+            return false;
         }
         const decoded = jwtDecode<TokenPayload>(token);
         const nowInSeconds = Math.floor(Date.now() / 1000);
@@ -31,7 +31,7 @@ export const setUserFromToken = (token: string | null) => {
             console.warn("Token har gått ut, rensar");
             createGuest();
             localStorage.removeItem("userToken");
-            return;
+            return false;
         }
 
         if (decoded.username) {
@@ -46,7 +46,31 @@ export const setUserFromToken = (token: string | null) => {
         }
 
         console.log("Användare satt från token:", decoded);
+
+        return true;
     } catch (err) {
         console.error("Fel vid decoding av token:", err);
+    }
+};
+
+export const logOut = () => {
+    localStorage.removeItem("userToken");
+};
+
+export const deleteUser = async (userId: string, token: string) => {
+    try {
+        const response = await fetch("/api/user/" + userId, {
+            method: "DELETE",
+            headers: {
+                Authorization: `Bearer: ${token}`,
+                "Content-Type": "application/json",
+            },
+        });
+
+        const message = await response.json();
+        return message;
+    } catch (error) {
+        console.error("Kunde inte hämta meddelanden:", error);
+        return error;
     }
 };

@@ -94,7 +94,6 @@ router.get(
         if (!authHeader) {
             return res.status(401).send("Missing Authorization header");
         }
-
         const token = authHeader.split(" ")[1];
 
         if (!token) {
@@ -102,11 +101,13 @@ router.get(
         }
 
         try {
-            const maybePayload: Payload | null = validateJwt(req.headers['authorization'])
+            const maybePayload: Payload | null = validateJwt(
+                req.headers["authorization"]
+            );
             if (!maybePayload) {
-                console.log('Gick inte att validera JWT')
-                res.sendStatus(401)
-                return
+                console.log("Gick inte att validera JWT");
+                res.sendStatus(401);
+                return;
             }
 
             const myId = maybePayload.userId;
@@ -147,8 +148,9 @@ router.get(
             const parsed = messagesSchema.safeParse(allMessages);
             //Kör med z zoderror sen
             if (!parsed.success) {
-
-                return res.status(500).send("Felaktigt meddelandeformat i databasen");
+                return res
+                    .status(500)
+                    .send("Felaktigt meddelandeformat i databasen");
             }
 
             res.send(parsed.data);

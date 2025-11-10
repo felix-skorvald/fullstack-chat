@@ -3,20 +3,27 @@ import "./Header.css";
 import back from "../img/back.svg";
 import userIcon from "../img/user.svg";
 import locked from "../img/locked.svg";
+import logout from "../img/logout.svg";
+
 import { useHeaderStore } from "../data/headerStore";
 import { useUserStore } from "../data/userStore";
+import { logOut } from "../data/login";
 
 const Header = () => {
+    const user = {
+        username: useUserStore((state) => state.username),
+        accessLevel: useUserStore((state) => state.accessLevel),
+        userId: useUserStore((state) => state.userId),
+    };
     const handleBack = () => {
         navigate("/chat");
     };
     const handleProfile = () => {
-        navigate("/profile");
+        navigate("/profile/" + user.userId);
     };
-
-    const user = {
-        username: useUserStore((state) => state.username),
-        accessLevel: useUserStore((state) => state.accessLevel),
+    const handleLogOut = () => {
+        logOut();
+        navigate("/");
     };
 
     const headerText = useHeaderStore((state) => state.headerText);
@@ -26,8 +33,8 @@ const Header = () => {
     const navigate = useNavigate();
     return (
         <header>
-            <button onClick={handleBack}>
-                <img src={back} alt="" />
+            <button onClick={handleLogOut}>
+                <img src={logout} alt="" />
             </button>
             <h3>{headerText}</h3>
             <button

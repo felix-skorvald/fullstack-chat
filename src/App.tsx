@@ -16,7 +16,7 @@ const router = createHashRouter([
         children: [
             { path: "/chat", element: <Chat /> },
             { path: "/chat/:type/:id", element: <Chat /> },
-            { path: "/profile", element: <Profile /> },
+            { path: "/profile/:id", element: <Profile /> },
         ],
     },
 ]);

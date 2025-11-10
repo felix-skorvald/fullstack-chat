@@ -22,6 +22,7 @@ const Chat = () => {
     const [users, setUsers] = useState<UserResponse[]>([]);
     const [channels, setChannels] = useState<ChannelResponse[]>([]);
     const token = localStorage.getItem("userToken");
+
     const user = {
         username: useUserStore((state) => state.username),
         accessLevel: useUserStore((state) => state.accessLevel),
@@ -47,12 +48,11 @@ const Chat = () => {
 
     useEffect(() => {
         setUserFromToken(token);
-
         if (!type && !id) {
             getAllUsers();
             getAllChannels();
         }
-    }, [type, id, token]);
+    }, [type, id]);
 
     if (type && id) {
         let chatName = "";

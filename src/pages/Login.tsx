@@ -1,19 +1,28 @@
 import { useNavigate } from "react-router";
 import "./Login.css";
-import { useState } from "react";
+import { useEffect, useState, type KeyboardEvent } from "react";
+import { setUserFromToken } from "../data/login";
 
 export default function Login() {
     const navigate = useNavigate();
-
     const [form, setForm] = useState({
         username: "",
         password: "",
     });
-
+    const [errors, setErrors] = useState({
+        username: "",
+        password: "",
+        confirmedPass: "",
+    });
     const [confirmedPass, setConfirmedPass] = useState("");
     const [message, setMessage] = useState("");
+    const [register, setregister] = useState(false);
+    const token = localStorage.getItem("userToken");
 
     const handleLogin = async () => {
+        if (!validate()) {
+            return;
+        }
         try {
             const res = await fetch("/api/login", {
                 method: "POST",
@@ -41,6 +50,9 @@ export default function Login() {
     };
 
     const handleRegister = async () => {
+        if (!validate()) {
+            return;
+        }
         try {
             const res = await fetch("/api/register", {
                 method: "POST",
@@ -67,7 +79,55 @@ export default function Login() {
         }
     };
 
-    const [register, setregister] = useState(false);
+    const validate = () => {
+        if (form.username.length < 1 && form.password.length < 1) {
+            setMessage("⚠️ Du måste fylla i din uppgifter");
+            setErrors({
+                username: "error",
+                password: "error",
+                confirmedPass: "",
+            });
+            return false;
+        }
+
+        if (form.username.length < 1) {
+            setMessage("⚠️ Du måste fylla i användarnamn");
+            setErrors({ username: "error", password: "", confirmedPass: "" });
+            return false;
+        }
+        if (form.password.length < 1) {
+            setMessage("⚠️ Du måste fylla i lösenord");
+            setErrors({ username: "", password: "error", confirmedPass: "" });
+            return false;
+        }
+        if (
+            (register && confirmedPass.length < 1) ||
+            (register && form.password !== confirmedPass)
+        ) {
+            setMessage("⚠️ Var snäll upprepa lösenordet");
+            setErrors({ username: "", password: "", confirmedPass: "error" });
+            return false;
+        }
+        setMessage("");
+        setErrors({ username: "", password: "", confirmedPass: "" });
+        return true;
+    };
+
+    const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            register ? handleRegister() : handleLogin();
+        }
+    };
+
+    useEffect(() => {
+        const run = async () => {
+            const shouldNavigate = await setUserFromToken(token);
+            if (shouldNavigate) {
+                navigate("/chat");
+            }
+        };
+        run();
+    }, [token, navigate]);
 
     return (
         <div className="login-page">
@@ -81,14 +141,30 @@ export default function Login() {
                     <button
                         disabled={!register}
                         className="tab-button"
-                        onClick={() => setregister(false)}
+                        onClick={() => {
+                            setregister(false);
+                            setMessage("");
+                            setErrors({
+                                username: "",
+                                password: "",
+                                confirmedPass: "",
+                            });
+                        }}
                     >
                         LOGGA IN
                     </button>
                     <button
                         disabled={register}
                         className="tab-button"
-                        onClick={() => setregister(true)}
+                        onClick={() => {
+                            setregister(true);
+                            setMessage("");
+                            setErrors({
+                                username: "",
+                                password: "",
+                                confirmedPass: "",
+                            });
+                        }}
                     >
                         REGISTRERA
                     </button>
@@ -98,6 +174,7 @@ export default function Login() {
                         <input
                             type="text"
                             placeholder="Användarnamn"
+                            className={errors.username}
                             value={form.username}
                             onChange={(event) =>
                                 setForm({
@@ -105,10 +182,12 @@ export default function Login() {
                                     username: event.target.value,
                                 })
                             }
+                            onKeyDown={handleKeyDown}
                         />
                         <input
                             type="password"
                             placeholder="Lösenord"
+                            className={errors.password}
                             value={form.password}
                             onChange={(event) =>
                                 setForm({
@@ -116,6 +195,7 @@ export default function Login() {
                                     password: event.target.value,
                                 })
                             }
+                            onKeyDown={handleKeyDown}
                         />
                         <p>{message}</p>
                         <button onClick={handleLogin}>LOGGA IN</button>
@@ -128,6 +208,7 @@ export default function Login() {
                         <input
                             type="text"
                             placeholder="Användarnamn"
+                            className={errors.username}
                             value={form.username}
                             onChange={(event) =>
                                 setForm({
@@ -135,32 +216,34 @@ export default function Login() {
                                     username: event.target.value,
                                 })
                             }
+                            onKeyDown={handleKeyDown}
                         />
                         <input
                             type="password"
                             placeholder="Lösenord"
+                            className={errors.password}
                             value={form.password}
-                            onChange={(event) =>
+                            onChange={(event) => {
                                 setForm({
                                     ...form,
                                     password: event.target.value,
-                                })
-                            }
+                                });
+                                validate();
+                            }}
+                            onKeyDown={handleKeyDown}
                         />
                         <input
                             type="password"
                             placeholder="Lösenord igen"
+                            className={errors.confirmedPass}
                             value={confirmedPass}
                             onChange={(event) =>
                                 setConfirmedPass(event.target.value)
                             }
+                            onKeyDown={handleKeyDown}
                         />
-                        <button
-                            disabled={form.password !== confirmedPass}
-                            onClick={handleRegister}
-                        >
-                            REGISTRERA DIG
-                        </button>
+                        <p>{message}</p>
+                        <button onClick={handleRegister}>REGISTRERA DIG</button>
                         <button onClick={() => navigate("/chat")}>
                             Fortsätt som Gäst
                         </button>

@@ -94,6 +94,7 @@ router.delete(
         const maybePayload: Payload | null = validateJwt(
             req.headers["authorization"]
         );
+
         if (!maybePayload) {
             console.log("Gick inte att validera JWT");
             res.sendStatus(401);
