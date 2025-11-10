@@ -39,12 +39,12 @@ export default function Login() {
                 setMessage("Lyckades LOGGA IN användare");
                 if (data.token) {
                     localStorage.setItem("userToken", data.token);
-                    //Kanske använda token?
                     console.log(data.token);
                     navigate("/chat");
                 }
             }
         } catch (err) {
+            setMessage("Fel användarnamn eller lösenord");
             console.error("Fel vid inloggning", err);
         }
     };
@@ -69,7 +69,6 @@ export default function Login() {
                 setMessage("Lyckades Regga användare");
                 if (data.token) {
                     localStorage.setItem("userToken", data.token);
-                    //Kanske använda token?
                     console.log(data.token);
                     navigate("/chat");
                 }
@@ -138,7 +137,7 @@ export default function Login() {
             }
         };
         run();
-    }, [token, navigate]);
+    }, [navigate]);
 
     return (
         <div className="login-page">

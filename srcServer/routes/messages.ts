@@ -5,6 +5,7 @@ import { db, tableName } from "../data/dynamoDb.js";
 import type { SendMessageBody, Message, Payload } from "../data/types.js";
 import { messageSchema, messagesSchema } from "../data/validation.js";
 import { validateJwt } from "../data/auth.js";
+import z from "zod";
 
 const router: Router = express.Router();
 
@@ -90,7 +91,7 @@ router.get(
     async (req: Request<{ idParam: string }>, res: Response) => {
         const receiverId = req.params.idParam;
         const authHeader = req.header("authorization");
-
+        //ZOD HÄR!
         if (!authHeader) {
             return res.status(401).send("Missing Authorization header");
         }
@@ -146,7 +147,7 @@ router.get(
             );
 
             const parsed = messagesSchema.safeParse(allMessages);
-            //Kör med z zoderror sen
+
             if (!parsed.success) {
                 return res
                     .status(500)
@@ -155,6 +156,9 @@ router.get(
 
             res.send(parsed.data);
         } catch (error) {
+            if (error instanceof z.ZodError) {
+                return res.status(400).send("Felaktig data från servern");
+            }
             if ((error as any).name === "JsonWebTokenError") {
                 return res.status(401).send("Invalid token");
             }

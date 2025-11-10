@@ -61,20 +61,37 @@ export const logOut = () => {
     localStorage.removeItem("userToken");
 };
 
-export const deleteUser = async (userId: string, token: string) => {
+interface DeleteResult {
+    success: boolean;
+}
+
+export const deleteUser = async (
+    userId: string,
+    token: string
+): Promise<DeleteResult> => {
+    const authHeader = `Bearer: ${token}`;
+
     try {
-        const response = await fetch("/api/user/" + userId, {
+        const response = await fetch("/api/users/" + userId, {
             method: "DELETE",
             headers: {
-                Authorization: `Bearer: ${token}`,
+                Authorization: authHeader,
                 "Content-Type": "application/json",
             },
         });
 
-        const message = await response.json();
-        return message;
+        if (response.ok) {
+            return { success: true };
+        }
+
+        console.error(
+            "HTTP-fel vid borttagning:",
+            response.status,
+            response.statusText
+        );
+        return { success: false };
     } catch (error) {
-        console.error("Kunde inte hämta meddelanden:", error);
-        return error;
+        console.error("Nätverksfel eller okänt fel vid borttagning:", error);
+        return { success: false };
     }
 };

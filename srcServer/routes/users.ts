@@ -103,7 +103,7 @@ router.delete(
 
         const { userId, accessLevel } = maybePayload;
         // Man får lov att ta bort en användare om man tar bort sig själv eller har accessLevel admin
-        if (userId !== userIdToDelete && accessLevel !== "admin") {
+        if (userId !== userIdToDelete) {
             console.log("Inte tillräcklig access level. ", userId, accessLevel);
             res.sendStatus(401);
             return;
