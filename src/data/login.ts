@@ -9,20 +9,24 @@ interface TokenPayload {
 }
 
 export const setUserFromToken = (token: string | null) => {
-    const { setUsername, setAccessLevel, setUserId } = useUserStore.getState();
-    const guestId = Math.floor(Math.random() * 1000);
+    const { setUsername, setAccessLevel, setUserId, accessLevel } =
+        useUserStore.getState();
 
     const createGuest = () => {
-        const tempId = String(crypto.randomUUID);
-        setUsername("Gäst" + guestId);
+        if (accessLevel != "guest") {
+            const guestId = Math.floor(Math.random() * 1000);
+            const tempId = String(crypto.randomUUID());
+            setUsername("Gäst" + guestId);
+            setUserId(tempId);
+        }
         setAccessLevel("guest");
-        setUserId(tempId);
     };
+
     try {
         //VALIDERA TOEKEN?
         if (!token) {
             createGuest();
-            console.log("finns ingen token" + guestId);
+            console.log("finns ingen token");
             return false;
         }
         const decoded = jwtDecode<TokenPayload>(token);

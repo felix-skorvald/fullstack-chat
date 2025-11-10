@@ -95,13 +95,24 @@ export default function Login() {
             setErrors({ username: "error", password: "", confirmedPass: "" });
             return false;
         }
-        if (form.password.length < 1) {
+        if (!register && form.password.length < 1) {
             setMessage("⚠️ Du måste fylla i lösenord");
             setErrors({ username: "", password: "error", confirmedPass: "" });
             return false;
         }
+        if (register && form.password.length < 8) {
+            setMessage("⚠️ Lösenordet måste vara minst 8 tecken");
+            setErrors({
+                username: "",
+                password: "error",
+                confirmedPass: "",
+            });
+            return false;
+        }
         if (
-            (register && confirmedPass.length < 1) ||
+            (form.password.length >= 1 &&
+                register &&
+                confirmedPass.length < 1) ||
             (register && form.password !== confirmedPass)
         ) {
             setMessage("⚠️ Var snäll upprepa lösenordet");
@@ -197,7 +208,7 @@ export default function Login() {
                             }
                             onKeyDown={handleKeyDown}
                         />
-                        <p>{message}</p>
+                        <p style={{ minHeight: "1.5em" }}>{message}</p>
                         <button onClick={handleLogin}>LOGGA IN</button>
                         <button onClick={() => navigate("/chat")}>
                             Fortsätt som Gäst
@@ -228,7 +239,6 @@ export default function Login() {
                                     ...form,
                                     password: event.target.value,
                                 });
-                                validate();
                             }}
                             onKeyDown={handleKeyDown}
                         />
@@ -242,7 +252,7 @@ export default function Login() {
                             }
                             onKeyDown={handleKeyDown}
                         />
-                        <p>{message}</p>
+                        <p style={{ minHeight: "1.5em" }}>{message}</p>
                         <button onClick={handleRegister}>REGISTRERA DIG</button>
                         <button onClick={() => navigate("/chat")}>
                             Fortsätt som Gäst
