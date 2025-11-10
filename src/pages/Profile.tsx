@@ -23,10 +23,15 @@ const Profile = () => {
     };
     return (
         <div className="profile">
-            <h3>Här kan du ta bort ditt konto eller logga ut</h3>
+            <h3>
+                Var hälsad {user.username}Här kan du ta bort ditt konto eller
+                logga ut
+            </h3>
             <div className="container">
                 {/* popup ÄR DU SÄKER DU KOMMER LOGGAS UT */}
-                <button onClick={handleDelete}>Ta bort konto</button>
+                <button onClick={handleDelete}>
+                    Ta bort konto med id {id}
+                </button>
                 <button>Logga ut</button>
             </div>
         </div>
