@@ -45,10 +45,10 @@ export default function Login() {
             }
         } catch (err) {
             setMessage("Fel användarnamn eller lösenord");
-            console.error("Fel vid inloggning", err);
+            console.error("Fel vid inloggning");
         }
     };
-
+    //skapa funktion för fetch!!!
     const handleRegister = async () => {
         if (!validate()) {
             return;

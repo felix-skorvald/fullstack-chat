@@ -48,8 +48,7 @@ export const setUserFromToken = (token: string | null) => {
         if (decoded.userId) {
             setUserId(decoded.userId);
         }
-
-        console.log("Användare satt från token:", decoded);
+        console.log("Användare skapad från token");
 
         return true;
     } catch (err) {

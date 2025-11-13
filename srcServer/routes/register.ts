@@ -11,6 +11,7 @@ import { signInSchema } from "../data/validation.js";
 const router: Router = express.Router();
 
 router.post(
+    //KOLLA SÅ DET INTE REDAN FINNS EN AVNÄANDAÄNRE
     "/",
     async (
         req: Request<{}, JwtResponse, UserBody>,

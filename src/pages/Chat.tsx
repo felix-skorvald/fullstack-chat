@@ -4,6 +4,7 @@ import { useUserStore } from "../data/userStore";
 import { setUserFromToken } from "../data/login";
 import { useParams, useNavigate } from "react-router";
 import ChatView from "../components/ChatView";
+import CreateNewChannel from "../components/CreateNewChannel";
 
 const Chat = () => {
     interface UserResponse {
@@ -22,7 +23,7 @@ const Chat = () => {
     const [users, setUsers] = useState<UserResponse[]>([]);
     const [channels, setChannels] = useState<ChannelResponse[]>([]);
     const token = localStorage.getItem("userToken");
-
+    const [isCreating, setIsCreating] = useState(false);
     const user = {
         username: useUserStore((state) => state.username),
         accessLevel: useUserStore((state) => state.accessLevel),
@@ -96,9 +97,17 @@ const Chat = () => {
                         {ch.channelName}
                     </button>
                 ))}
-                <button disabled={user.accessLevel !== "user"}>
-                    + Skapa ny kanal
-                </button>
+
+                {isCreating ? (
+                    <CreateNewChannel />
+                ) : (
+                    <button
+                        disabled={user.accessLevel !== "user"}
+                        onClick={() => setIsCreating(true)}
+                    >
+                        + Skapa ny kanal
+                    </button>
+                )}
             </div>
 
             <h3>DMs</h3>

@@ -1,0 +1,16 @@
+.new-channel {
+    display: flex;
+    flex-direction: column;
+
+    label {
+        font-size: larger;
+        font-weight: 400;
+    }
+
+    .radios {
+        display: flex;
+        gap: 1rem;
+        align-items: center;
+        justify-content: center;
+    }
+}
