@@ -1,28 +1,53 @@
+import { useState } from "react";
 import { createChannel } from "../data/channel";
 import { useUserStore } from "../data/userStore";
 import "./CreateNewChannel.css";
 
-const CreateNewChannel = () => {
+type Props = {
+    setIsCreating: React.Dispatch<React.SetStateAction<boolean>>;
+};
+
+const CreateNewChannel = ({ setIsCreating }: Props) => {
     const user = {
-        username: useUserStore((state) => state.username),
-        accessLevel: useUserStore((state) => state.accessLevel),
+        userId: useUserStore((state) => state.userId),
     };
 
-    const handleCreate = () => {};
+    const [newChannel, setNewChannel] = useState({
+        channelName: "",
+        createdBy: user.userId,
+        isPrivate: true
+    })
+
+    const handleCreate = () => {
+        if (newChannel.channelName.length >= 1) {
+            createChannel(newChannel.channelName, newChannel.createdBy, newChannel.isPrivate)
+            console.log(newChannel)
+        }
+    };
     return (
         <div className="new-channel">
-            <label htmlFor="">Kanalnamn</label>
-            <input type="text" />
-            <label htmlFor="">Privat?</label>
-            <div className="radios">
-                <label htmlFor="">Ja</label>
-                <input type="radio" name="isPrivate" id="yes" checked />
-                <label htmlFor="">Nej</label>
-                <input type="radio" name="isPrivate" id="no" />
+            <label htmlFor="channelName">Kanalnamn</label>
+            <input
+                id="channelName"
+                type="text"
+                value={newChannel.channelName}
+                onChange={(e) => setNewChannel({ ...newChannel, channelName: e.target.value })}
+            />
+
+            <div className="checkbox">
+                <input
+                    type="checkbox"
+                    id="isPrivate"
+                    checked={newChannel.isPrivate}
+                    onChange={(e) => setNewChannel({ ...newChannel, isPrivate: e.target.checked })}
+                />
+                <label htmlFor="isPrivate">Gör kanalen privat</label>
             </div>
-            <button onClick={() => handleCreate}>Skapa Kanal</button>
+
+            <button onClick={handleCreate}>Skapa kanal</button>
+            <button onClick={() => setIsCreating(false)}>Avbryt</button>
         </div>
     );
-};
+}
 
 export default CreateNewChannel;

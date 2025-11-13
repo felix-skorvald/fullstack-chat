@@ -1,10 +1,10 @@
 export const createChannel = async (
     channelName: string,
     createdBy: string,
-    isPrivate: string
+    isPrivate: boolean
 ): Promise<void> => {
     try {
-        const res = await fetch("/api/message", {
+        const res = await fetch("/api/channel", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
@@ -17,7 +17,7 @@ export const createChannel = async (
         });
 
         if (!res.ok) {
-            console.error("Kunde inte skicka meddelande");
+            console.error("Kunde inte skapa kanal");
         }
 
         console.log("Kanal Skapad" + channelName);

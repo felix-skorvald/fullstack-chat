@@ -26,13 +26,11 @@ export const setUserFromToken = (token: string | null) => {
         //VALIDERA TOEKEN?
         if (!token) {
             createGuest();
-            console.log("finns ingen token");
             return false;
         }
         const decoded = jwtDecode<TokenPayload>(token);
         const nowInSeconds = Math.floor(Date.now() / 1000);
         if (decoded.exp && decoded.exp < nowInSeconds) {
-            console.warn("Token har gått ut, rensar");
             createGuest();
             localStorage.removeItem("userToken");
             return false;
@@ -48,7 +46,6 @@ export const setUserFromToken = (token: string | null) => {
         if (decoded.userId) {
             setUserId(decoded.userId);
         }
-        console.log("Användare skapad från token");
 
         return true;
     } catch (err) {

@@ -99,7 +99,7 @@ const Chat = () => {
                 ))}
 
                 {isCreating ? (
-                    <CreateNewChannel />
+                    <CreateNewChannel setIsCreating={setIsCreating} />
                 ) : (
                     <button
                         disabled={user.accessLevel !== "user"}
