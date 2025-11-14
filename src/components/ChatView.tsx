@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from "react";
 import { getChannelMessages, getUserMessages } from "../data/getMessages";
 import "./ChatView.css";
 import SendMessage from "./SendMessage";
+import { useHeaderStore } from "../data/headerStore";
 
 interface Message {
     pk: string;
@@ -24,6 +25,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
     const bottomRef = useRef<HTMLDivElement | null>(null);
+    const setHeaderText = useHeaderStore((state) => state.setHeaderText);
 
     const fetchMessages = async () => {
         try {
@@ -44,6 +46,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
             const sorted = data.sort((a, b) =>
                 a.timestamp.localeCompare(b.timestamp)
             );
+            setHeaderText(chatName)
             setMessages(sorted);
         } catch (error) {
             console.error("Fel vid hämtning av meddelanden:", error);
@@ -64,8 +67,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
         <div className="chat-view">
             {loading ? (
                 <p>
-                    Laddar meddelanden... {chatName}
-                    {type}
+                    Laddar meddelanden...
                 </p>
             ) : (
                 <div>

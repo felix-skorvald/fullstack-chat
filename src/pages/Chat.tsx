@@ -98,6 +98,8 @@ const Chat = () => {
                     </button>
                 ))}
 
+                <div className="stroke"></div>
+
                 {isCreating ? (
                     <CreateNewChannel setIsCreating={setIsCreating} />
                 ) : (

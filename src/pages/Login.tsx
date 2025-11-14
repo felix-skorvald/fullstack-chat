@@ -2,6 +2,7 @@ import { useNavigate } from "react-router";
 import "./Login.css";
 import { useEffect, useState, type KeyboardEvent } from "react";
 import { setUserFromToken } from "../data/login";
+import { validate } from "../data/validate";
 
 export default function Login() {
     const navigate = useNavigate();
@@ -20,7 +21,7 @@ export default function Login() {
     const token = localStorage.getItem("userToken");
 
     const handleLogin = async () => {
-        if (!validate()) {
+        if (!validate(setMessage, setErrors, form, confirmedPass, register)) {
             return;
         }
         try {
@@ -39,7 +40,6 @@ export default function Login() {
                 setMessage("Lyckades LOGGA IN användare");
                 if (data.token) {
                     localStorage.setItem("userToken", data.token);
-                    console.log(data.token);
                     navigate("/chat");
                 }
             }
@@ -50,7 +50,7 @@ export default function Login() {
     };
     //skapa funktion för fetch!!!
     const handleRegister = async () => {
-        if (!validate()) {
+        if (!validate(setMessage, setErrors, form, confirmedPass, register)) {
             return;
         }
         try {
@@ -69,59 +69,16 @@ export default function Login() {
                 setMessage("Lyckades Regga användare");
                 if (data.token) {
                     localStorage.setItem("userToken", data.token);
-                    console.log(data.token);
                     navigate("/chat");
                 }
+            } else {
+                setMessage("Användarnamnet är upptaget")
             }
         } catch (err) {
-            console.error("Fel vid inloggning", err);
+            console.error("Fel vid registrering", err);
         }
     };
 
-    const validate = () => {
-        if (form.username.length < 1 && form.password.length < 1) {
-            setMessage("⚠️ Du måste fylla i din uppgifter");
-            setErrors({
-                username: "error",
-                password: "error",
-                confirmedPass: "",
-            });
-            return false;
-        }
-
-        if (form.username.length < 1) {
-            setMessage("⚠️ Du måste fylla i användarnamn");
-            setErrors({ username: "error", password: "", confirmedPass: "" });
-            return false;
-        }
-        if (!register && form.password.length < 1) {
-            setMessage("⚠️ Du måste fylla i lösenord");
-            setErrors({ username: "", password: "error", confirmedPass: "" });
-            return false;
-        }
-        if (register && form.password.length < 8) {
-            setMessage("⚠️ Lösenordet måste vara minst 8 tecken");
-            setErrors({
-                username: "",
-                password: "error",
-                confirmedPass: "",
-            });
-            return false;
-        }
-        if (
-            (form.password.length >= 1 &&
-                register &&
-                confirmedPass.length < 1) ||
-            (register && form.password !== confirmedPass)
-        ) {
-            setMessage("⚠️ Var snäll upprepa lösenordet");
-            setErrors({ username: "", password: "", confirmedPass: "error" });
-            return false;
-        }
-        setMessage("");
-        setErrors({ username: "", password: "", confirmedPass: "" });
-        return true;
-    };
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {

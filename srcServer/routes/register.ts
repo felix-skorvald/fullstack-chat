@@ -1,17 +1,17 @@
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
+import { PutCommand, QueryCommand } from "@aws-sdk/lib-dynamodb";
 import express from "express";
 import type { Router, Request, Response } from "express";
 import { db, tableName } from "../data/dynamoDb.js";
 import { createToken } from "../data/auth.js";
-import type { JwtResponse, UserBody, ErrorResponse } from "../data/types.js";
+import type { JwtResponse, UserBody, ErrorResponse, UserItem } from "../data/types.js";
 import { genSalt, hash } from "bcrypt";
 import z from "zod";
-import { signInSchema } from "../data/validation.js";
+import { signInSchema, usersSchema } from "../data/validation.js";
+
 
 const router: Router = express.Router();
 
 router.post(
-    //KOLLA SÅ DET INTE REDAN FINNS EN AVNÄANDAÄNRE
     "/",
     async (
         req: Request<{}, JwtResponse, UserBody>,
@@ -20,6 +20,28 @@ router.post(
         try {
             const body: UserBody = signInSchema.parse(req.body);
             console.log("body", body);
+
+            const allUsersCommand = new QueryCommand({
+                TableName: tableName,
+                KeyConditionExpression: "pk = :value",
+                ExpressionAttributeValues: {
+                    ":value": "USER",
+                },
+            });
+
+            const allUsersResult = await db.send(allUsersCommand);
+            const users: UserItem[] = usersSchema.parse(allUsersResult.Items ?? []);
+
+            const usernameTaken = users.some(
+                (u) => u.username.toLowerCase() === body.username.toLowerCase()
+            );
+
+            if (usernameTaken) {
+                return res.status(400).json({
+                    success: false,
+                    message: "Användarnamnet är redan upptaget",
+                });
+            }
 
             const newId = crypto.randomUUID();
 
@@ -38,14 +60,15 @@ router.post(
                 },
             });
 
-            const result = await db.send(command);
+            await db.send(command);
+
             const token: string | null = createToken(
                 newId,
                 "user",
                 body.username
             );
-            console.log(result);
-            res.send({ success: true, token: token });
+
+            res.send({ success: true, token });
         } catch (error) {
             if (error instanceof z.ZodError) {
                 return res.status(400).json({

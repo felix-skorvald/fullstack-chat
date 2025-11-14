@@ -1,10 +1,18 @@
 .chat {
     padding: 1rem;
     padding-top: 6rem;
+
     .container {
         padding: 1rem;
     }
+
     a {
         color: rgb(224, 144, 144);
+    }
+
+    .stroke {
+        background-color: #515378;
+        height: 0.5rem;
+        border-radius: 10px;
     }
 }

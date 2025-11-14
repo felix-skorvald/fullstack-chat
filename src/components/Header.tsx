@@ -16,8 +16,11 @@ const Header = () => {
         accessLevel: useUserStore((state) => state.accessLevel),
         userId: useUserStore((state) => state.userId),
     };
+    const headerText = useHeaderStore((state) => state.headerText);
+    const setHeaderText = useHeaderStore((state) => state.setHeaderText)
     const handleBack = () => {
         navigate("/chat");
+        setHeaderText("Chappy")
     };
     const handleProfile = () => {
         navigate("/profile/" + user.userId);
@@ -27,7 +30,6 @@ const Header = () => {
         navigate("/");
     };
 
-    const headerText = useHeaderStore((state) => state.headerText);
 
     //TODO en delad state för att BACKA!
 
@@ -35,8 +37,8 @@ const Header = () => {
     return (
         <header>
             {location.pathname.startsWith("/chat/dm") ||
-            location.pathname.startsWith("/chat/channel") ||
-            location.pathname.startsWith("/profile/") ? (
+                location.pathname.startsWith("/chat/channel") ||
+                location.pathname.startsWith("/profile/") ? (
                 <button onClick={handleBack}>
                     <img src={back} alt="" />
                 </button>
