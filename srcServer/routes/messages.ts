@@ -48,6 +48,10 @@ router.post(
             messageId: newId,
         };
 
+        if (body.message.length < 1) {
+            return res.status(400)
+        }
+
         const command = new PutCommand({
             TableName: tableName,
             Item: message,

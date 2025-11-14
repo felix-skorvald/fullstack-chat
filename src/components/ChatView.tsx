@@ -60,7 +60,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
     }, [id]);
 
     useEffect(() => {
-        bottomRef.current?.scrollIntoView({ behavior: "smooth" });
+        bottomRef.current?.scrollIntoView({ behavior: "instant" });
     }, [messages]);
 
     return (
