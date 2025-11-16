@@ -3,13 +3,15 @@ import express from "express";
 import type { Router, Request, Response } from "express";
 import { db, tableName } from "../data/dynamoDb.js";
 import type { SendMessageBody, Message, Payload } from "../data/types.js";
-import { messageSchema, messagesSchema } from "../data/validation.js";
+import {
+    messagesSchema,
+    payloadSchema,
+    sendMessageSchema,
+} from "../data/validation.js";
 import { validateJwt } from "../data/auth.js";
 import z from "zod";
 
 const router: Router = express.Router();
-
-const jwtSecret: string = process.env.JWT_SECRET || "";
 
 router.post(
     "/",
@@ -17,105 +19,113 @@ router.post(
         req: Request<{}, Message, SendMessageBody>,
         res: Response<Message | string>
     ) => {
-        //ZOD
-        const body: SendMessageBody = req.body;
-        console.log("body", body);
-
-        const newId = crypto.randomUUID();
-        const now = new Date();
-        const timeKey = now
-            .toISOString()
-            .replace(/[-:.TZ]/g, "")
-            .slice(0, 14);
-        const timestamp = now.toISOString();
-
-        const newSk =
-            "RID#" +
-            body.receiverId +
-            "#SID#" +
-            body.senderId +
-            "#TIME#" +
-            timeKey;
-
-        const message = {
-            senderId: body.senderId,
-            receiverId: body.receiverId,
-            senderName: body.senderName,
-            message: body.message,
-            timestamp: timestamp,
-            pk: "MESSAGE",
-            sk: newSk,
-            messageId: newId,
-        };
-
-        if (body.message.length < 1) {
-            return res.status(400)
-        }
-
-        const command = new PutCommand({
-            TableName: tableName,
-            Item: message,
-        });
         try {
-            const result = await db.send(command);
+            const body: SendMessageBody = sendMessageSchema.parse(req.body);
+
+            const newId = crypto.randomUUID();
+            const now = new Date();
+            const timeKey = now
+                .toISOString()
+                .replace(/[-:.TZ]/g, "")
+                .slice(0, 14);
+            const timestamp = now.toISOString();
+
+            const newSk =
+                "RID#" +
+                body.receiverId +
+                "#SID#" +
+                body.senderId +
+                "#TIME#" +
+                timeKey;
+
+            const message = {
+                senderId: body.senderId,
+                receiverId: body.receiverId,
+                senderName: body.senderName,
+                message: body.message,
+                timestamp: timestamp,
+                pk: "MESSAGE",
+                sk: newSk,
+                messageId: newId,
+            };
+
+            const command = new PutCommand({
+                TableName: tableName,
+                Item: message,
+            });
+
+            await db.send(command);
             res.send(message);
         } catch (error) {
-            console.log(`FEl med meddelande:`, (error as any)?.message);
-            res.status(500).send("error i server");
+            if (error instanceof z.ZodError) {
+                return res.status(400).send("Invalid message data");
+            }
+            console.error("Error sending message:", error);
+            res.status(500).send("Server error");
         }
     }
 );
 
 router.get(
     "/channel/:idParam",
-    async (req: Request<{ idParam: string }>, res: Response) => {
-        const receiverId = req.params.idParam;
-        // Autetnisera if is private??
-        const params = {
-            TableName: tableName,
-            KeyConditionExpression: "pk = :pk AND begins_with(sk, :skPrefix)",
-            ExpressionAttributeValues: {
-                ":pk": "MESSAGE",
-                ":skPrefix": `RID#${receiverId}`,
-            },
-        };
-
+    async (
+        req: Request<{ idParam: string }>,
+        res: Response<Message[] | string>
+    ) => {
         try {
+            const receiverId = req.params.idParam;
+
+            const params = {
+                TableName: tableName,
+                KeyConditionExpression:
+                    "pk = :pk AND begins_with(sk, :skPrefix)",
+                ExpressionAttributeValues: {
+                    ":pk": "MESSAGE",
+                    ":skPrefix": `RID#${receiverId}`,
+                },
+            };
+
             const result = await db.send(new QueryCommand(params));
-            res.send(result.Items || []);
+
+            if (!result.Items) {
+                return res.send([]);
+            }
+
+            const messages = messagesSchema.parse(result.Items);
+
+            res.send(messages);
         } catch (error) {
-            console.log("GET channel fel:", (error as any)?.message);
-            res.status(500).send("Error i servern");
+            if (error instanceof z.ZodError) {
+                return res
+                    .status(500)
+                    .send("Invalid data format from database");
+            }
+            console.error("Error fetching channel messages:", error);
+            res.status(500).send("Server error");
         }
     }
 );
 
 router.get(
     "/user/:idParam",
-    async (req: Request<{ idParam: string }>, res: Response) => {
-        const receiverId = req.params.idParam;
-        const authHeader = req.header("authorization");
-        //ZOD HÄR!
-        if (!authHeader) {
-            return res.status(401).send("Missing Authorization header");
-        }
-        const token = authHeader.split(" ")[1];
-
-        if (!token) {
-            return res.status(401).send("Invalid Authorization header format");
-        }
-
+    async (
+        req: Request<{ idParam: string }>,
+        res: Response<Message[] | string>
+    ) => {
         try {
+            const receiverId = req.params.idParam;
+
             const maybePayload: Payload | null = validateJwt(
                 req.headers["authorization"]
             );
+
             if (!maybePayload) {
-                console.log("Gick inte att validera JWT");
-                res.sendStatus(401);
-                return;
+                return res.status(401).send("Unauthorized");
             }
 
-            const myId = maybePayload.userId;
+            const payload = payloadSchema.parse(maybePayload);
+            const myId = payload.userId;
+
             const params1 = {
                 TableName: tableName,
                 KeyConditionExpression:
@@ -150,24 +160,15 @@ router.get(
                 a.sk.localeCompare(b.sk, "en", { sensitivity: "base" })
             );
 
-            const parsed = messagesSchema.safeParse(allMessages);
+            const messages = messagesSchema.parse(allMessages);
 
-            if (!parsed.success) {
-                return res
-                    .status(500)
-                    .send("Felaktigt meddelandeformat i databasen");
-            }
-
-            res.send(parsed.data);
+            res.send(messages);
         } catch (error) {
             if (error instanceof z.ZodError) {
-                return res.status(400).send("Felaktig data från servern");
+                return res.status(400).send("Invalid data format");
             }
-            if ((error as any).name === "JsonWebTokenError") {
-                return res.status(401).send("Invalid token");
-            }
-
-            res.status(500).send("Error i servern");
+            console.error("Error fetching user messages:", error);
+            res.status(500).send("Server error");
         }
     }
 );

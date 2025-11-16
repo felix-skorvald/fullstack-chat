@@ -11,6 +11,13 @@ const messageSchema = z.object({
     sk: z.string().min(1),
 });
 
+const sendMessageSchema = z.object({
+    message: z.string().min(1),
+    senderId: z.string().min(1),
+    receiverId: z.string().min(1),
+    senderName: z.string().min(1),
+});
+
 const signInSchema = z.object({
     username: z.string().min(1),
     password: z.string().min(1),
@@ -69,7 +76,8 @@ export {
     channelsSchema,
     userSchema,
     usersSchema,
-    payloadSchema
+    payloadSchema,
+    sendMessageSchema,
 };
 
 export type { Message, Messages, NewChannel, Channel };

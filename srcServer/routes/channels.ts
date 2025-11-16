@@ -16,14 +16,7 @@ import {
 } from "../data/validation.js";
 import z from "zod";
 import { validateJwt } from "../data/auth.js";
-import type { Payload } from "../data/types.js";
-
-interface ChannelResponse {
-    channelName: string;
-    channelId: string;
-    createdBy: string;
-    isPrivate: boolean;
-}
+import type { ChannelResponse, Payload } from "../data/types.js";
 
 const router: Router = express.Router();
 
@@ -44,7 +37,6 @@ router.get("/", async (req, res: Response<ChannelResponse[] | string>) => {
         }
 
         const channels: ChannelResponse[] = channelsSchema.parse(output.Items);
-        console.log(channels);
         res.send(
             channels.map((ch) => ({
                 channelName: ch.channelName,

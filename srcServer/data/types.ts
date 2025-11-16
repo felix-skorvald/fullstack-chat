@@ -1,5 +1,3 @@
-// USER
-
 export interface LoginBody {
     username: string;
     password: string;
@@ -10,8 +8,6 @@ export interface LoginResponse {
     userId: string;
     token: string;
 }
-
-// MESSAGE
 
 export interface Message {
     pk: string;
@@ -31,7 +27,6 @@ export interface SendMessageBody {
     senderName: string;
 }
 
-// Används för body vid request: /login och /register
 export interface UserBody {
     username: string;
     password: string;
@@ -39,7 +34,7 @@ export interface UserBody {
 
 export interface JwtResponse {
     success: boolean;
-    token?: string; // JWT
+    token?: string;
 }
 
 export interface Payload {
@@ -49,7 +44,6 @@ export interface Payload {
     exp: number;
 }
 
-// Beskriver user-items från databasen
 export interface UserItem {
     pk: string;
     sk: string;
@@ -61,4 +55,19 @@ export interface UserItem {
 export interface ErrorResponse {
     sucess: boolean;
     message: string;
+}
+
+export interface UserResponse {
+    username: string;
+    userId: string;
+}
+export interface UserIdParam {
+    userId: string;
+}
+
+export interface ChannelResponse {
+    channelName: string;
+    channelId: string;
+    createdBy: string;
+    isPrivate: boolean;
 }

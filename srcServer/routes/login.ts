@@ -30,7 +30,6 @@ router.post(
             });
             const output = await db.send(command);
             if (!output.Items) {
-                console.log("No items from db");
                 res.sendStatus(404);
                 return;
             }
@@ -40,7 +39,6 @@ router.post(
                 (user) => user.username === body.username
             );
             if (!found) {
-                console.log("No matching user");
                 res.sendStatus(401);
                 return;
             }
@@ -50,15 +48,9 @@ router.post(
                 found.passwordHash
             );
             if (!passwordMatch) {
-                console.log(
-                    "Wrong password",
-                    body.password,
-                    found.passwordHash
-                );
                 res.sendStatus(401);
                 return;
             }
-            console.log("Found user", found);
             const token: string = createToken(
                 found.sk.substring(5),
                 found.accessLevel,

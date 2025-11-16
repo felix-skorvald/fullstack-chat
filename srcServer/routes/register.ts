@@ -3,11 +3,15 @@ import express from "express";
 import type { Router, Request, Response } from "express";
 import { db, tableName } from "../data/dynamoDb.js";
 import { createToken } from "../data/auth.js";
-import type { JwtResponse, UserBody, ErrorResponse, UserItem } from "../data/types.js";
+import type {
+    JwtResponse,
+    UserBody,
+    ErrorResponse,
+    UserItem,
+} from "../data/types.js";
 import { genSalt, hash } from "bcrypt";
 import z from "zod";
 import { signInSchema, usersSchema } from "../data/validation.js";
-
 
 const router: Router = express.Router();
 
@@ -19,7 +23,6 @@ router.post(
     ) => {
         try {
             const body: UserBody = signInSchema.parse(req.body);
-            console.log("body", body);
 
             const allUsersCommand = new QueryCommand({
                 TableName: tableName,
@@ -30,7 +33,9 @@ router.post(
             });
 
             const allUsersResult = await db.send(allUsersCommand);
-            const users: UserItem[] = usersSchema.parse(allUsersResult.Items ?? []);
+            const users: UserItem[] = usersSchema.parse(
+                allUsersResult.Items ?? []
+            );
 
             const usernameTaken = users.some(
                 (u) => u.username.toLowerCase() === body.username.toLowerCase()

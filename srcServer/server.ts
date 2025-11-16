@@ -5,6 +5,7 @@ import registerRouter from "./routes/register.js";
 import messageRouter from "./routes/messages.js";
 import channelRouter from "./routes/channels.js";
 import loginRouter from "./routes/login.js";
+import { logger } from "./functions/logger.js";
 
 const app: Express = express();
 const port: number = Number(process.env.PORT) || 10000;
@@ -12,6 +13,7 @@ const port: number = Number(process.env.PORT) || 10000;
 // Middleware
 app.use(express.json());
 app.use(express.static("dist"));
+app.use(logger);
 
 //Endpoints
 app.use("/api/users", userRouter);
