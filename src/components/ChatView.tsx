@@ -3,6 +3,8 @@ import { getChannelMessages, getUserMessages } from "../data/getMessages";
 import "./ChatView.css";
 import SendMessage from "./SendMessage";
 import { useHeaderStore } from "../data/headerStore";
+import { deleteChannel, getChannel } from "../data/channel";
+import { useUserStore } from "../data/userStore";
 
 interface Message {
     pk: string;
@@ -15,21 +17,36 @@ interface Message {
     messageId: string;
 }
 
+interface Channel {
+    channelName: string;
+    channelId: string;
+    createdBy: string;
+    isPrivate: boolean;
+}
+
 interface ChatViewProps {
     type: string;
     id: string;
     chatName: string;
+    createdBy?: string;
 }
 
-const ChatView = ({ type, id, chatName }: ChatViewProps) => {
+const ChatView = ({ type, id, chatName, createdBy }: ChatViewProps) => {
+    const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
     const bottomRef = useRef<HTMLDivElement | null>(null);
     const setHeaderText = useHeaderStore((state) => state.setHeaderText);
+    const token = localStorage.getItem("userToken");
+    const user = {
+        username: useUserStore((state) => state.username),
+        userId: useUserStore((state) => state.userId),
+    };
 
     const fetchMessages = async () => {
         try {
             let data: Message[] = [];
+            let channel: Channel | null = null;
 
             setLoading(true);
             if (type === "dm") {
@@ -42,6 +59,8 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
                 data = await getUserMessages(id, token);
             } else if (type === "channel") {
                 data = await getChannelMessages(id);
+                channel = await getChannel(id);
+                setChannelInfo(channel);
             }
             const sorted = data.sort((a, b) =>
                 a.timestamp.localeCompare(b.timestamp)
@@ -53,6 +72,10 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
         } finally {
             setLoading(false);
         }
+    };
+
+    const handleDelete = (chatID: string) => {
+        deleteChannel(chatID, String(token));
     };
 
     useEffect(() => {
@@ -69,6 +92,17 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
                 <p>Laddar meddelanden...</p>
             ) : (
                 <div>
+                    {type === "channel" &&
+                        channelInfo &&
+                        channelInfo.createdBy === user.userId && (
+                            <button
+                                className="delete-button"
+                                onClick={() => handleDelete(id)}
+                            >
+                                Radera kanalen?
+                            </button>
+                        )}
+
                     {messages.map((msg) => (
                         <div className="message" key={msg.messageId}>
                             <p>
