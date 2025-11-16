@@ -1,6 +1,6 @@
 # Fullstack Chat App
 
-Chappy är en enkel chattapplikation byggd som ett fullstackprojekt med Node/Express, TypeScript, React och DynamoDB. Appen låter användare registrera sig, logga in, skicka meddelanden i öppna eller låsta kanaler och skicka DM till andra användare. Gäster kan läsa öppna kanaler samt skriva, men inloggning krävs för allt annat.
+Detta är en enkel chattapplikation byggd som ett fullstackprojekt med Node/Express, TypeScript, React och DynamoDB. Appen låter användare registrera sig, logga in, skicka meddelanden i öppna eller låsta kanaler och skicka DM till andra användare. Gäster kan läsa öppna kanaler samt skriva, men inloggning krävs för allt annat.
 
 Projektet följer en monorepostruktur och använder modern validering, säkra lösenord och JWT-baserad autentisering.
 
@@ -20,7 +20,7 @@ Skapa och ta bort kanaler (endast skaparen)
 
 Ta bort sitt konto
 
-(Ingen realtid — meddelanden hämtas via API calls.)
+(Ingen realtid, meddelanden hämtas via API calls. Men det är TODO att fixa a s a p)
 
 ## Tech Stack
 
