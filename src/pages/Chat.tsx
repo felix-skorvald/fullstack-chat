@@ -5,6 +5,7 @@ import { setUserFromToken } from "../data/login";
 import { useParams, useNavigate } from "react-router";
 import ChatView from "../components/ChatView";
 import CreateNewChannel from "../components/CreateNewChannel";
+import { useHeaderStore } from "../data/headerStore";
 
 const Chat = () => {
     interface UserResponse {
@@ -24,6 +25,7 @@ const Chat = () => {
     const [channels, setChannels] = useState<ChannelResponse[]>([]);
     const token = localStorage.getItem("userToken");
     const [isCreating, setIsCreating] = useState(false);
+    const setHeaderText = useHeaderStore((state) => state.setHeaderText);
     const user = {
         username: useUserStore((state) => state.username),
         accessLevel: useUserStore((state) => state.accessLevel),
@@ -52,6 +54,7 @@ const Chat = () => {
         if (!type && !id) {
             getAllUsers();
             getAllChannels();
+            setHeaderText("Chappy")
         }
     }, [type, id]);
 
