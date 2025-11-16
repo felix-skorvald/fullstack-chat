@@ -28,10 +28,9 @@ interface ChatViewProps {
     type: string;
     id: string;
     chatName: string;
-    createdBy?: string;
 }
 
-const ChatView = ({ type, id, chatName, createdBy }: ChatViewProps) => {
+const ChatView = ({ type, id, chatName }: ChatViewProps) => {
     const [channelInfo, setChannelInfo] = useState<Channel | null>(null);
     const [messages, setMessages] = useState<Message[]>([]);
     const [loading, setLoading] = useState(true);
