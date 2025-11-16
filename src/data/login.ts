@@ -1,12 +1,23 @@
 import { jwtDecode } from "jwt-decode";
 import { useUserStore } from "../data/userStore";
 
+
+interface DeleteResult {
+    success: boolean;
+}
+
 interface TokenPayload {
     userId: string;
     username: string;
     accessLevel: string;
     exp: number;
 }
+
+type AuthResponse = {
+    success: boolean;
+    token?: string;
+    message?: string;
+};
 
 export const setUserFromToken = (token: string | null) => {
     const { setUsername, setAccessLevel, setUserId, accessLevel } =
@@ -57,10 +68,6 @@ export const logOut = () => {
     localStorage.removeItem("userToken");
 };
 
-interface DeleteResult {
-    success: boolean;
-}
-
 export const deleteUser = async (
     userId: string,
     token: string
@@ -90,4 +97,25 @@ export const deleteUser = async (
         console.error("Nätverksfel eller okänt fel vid borttagning:", error);
         return { success: false };
     }
+};
+
+
+export const authFetch = async (
+    endpoint: "login" | "register",
+    username: string,
+    password: string
+): Promise<AuthResponse> => {
+    const res = await fetch(`/api/${endpoint}`, {
+        method: "POST",
+        body: JSON.stringify({ username, password }),
+        headers: {
+            "Content-type": "application/json",
+        },
+    });
+
+    if (!res.ok) {
+        throw new Error(`HTTP error! ${res.status}`);
+    }
+
+    return await res.json();
 };

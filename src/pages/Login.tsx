@@ -1,7 +1,7 @@
 import { useNavigate } from "react-router";
 import "./Login.css";
 import { useEffect, useState, type KeyboardEvent } from "react";
-import { setUserFromToken } from "../data/login";
+import { authFetch, setUserFromToken } from "../data/login";
 import { validate } from "../data/validate";
 
 export default function Login() {
@@ -24,61 +24,43 @@ export default function Login() {
         if (!validate(setMessage, setErrors, form, confirmedPass, register)) {
             return;
         }
+
         try {
-            const res = await fetch("/api/login", {
-                method: "POST",
-                body: JSON.stringify({
-                    username: form.username,
-                    password: form.password,
-                }),
-                headers: {
-                    "Content-type": "application/json",
-                },
-            });
-            const data = await res.json();
-            if (data.success) {
-                setMessage("Lyckades LOGGA IN användare");
-                if (data.token) {
-                    localStorage.setItem("userToken", data.token);
-                    navigate("/chat");
-                }
+            const data = await authFetch("login", form.username, form.password);
+
+            if (data.success && data.token) {
+                setMessage("Lyckades logga in användare");
+                localStorage.setItem("userToken", data.token);
+                navigate("/chat");
+            } else {
+                setMessage("Fel användarnamn eller lösenord");
             }
         } catch (err) {
             setMessage("Fel användarnamn eller lösenord");
-            console.error("Fel vid inloggning");
+            console.error("Fel vid inloggning:", err);
         }
     };
-    //skapa funktion för fetch!!!
+
     const handleRegister = async () => {
         if (!validate(setMessage, setErrors, form, confirmedPass, register)) {
             return;
         }
+
         try {
-            const res = await fetch("/api/register", {
-                method: "POST",
-                body: JSON.stringify({
-                    username: form.username,
-                    password: form.password,
-                }),
-                headers: {
-                    "Content-type": "application/json",
-                },
-            });
-            const data = await res.json();
-            if (data.success) {
-                setMessage("Lyckades Regga användare");
-                if (data.token) {
-                    localStorage.setItem("userToken", data.token);
-                    navigate("/chat");
-                }
+            const data = await authFetch("register", form.username, form.password);
+
+            if (data.success && data.token) {
+                setMessage("Lyckades registrera användare");
+                localStorage.setItem("userToken", data.token);
+                navigate("/chat");
             } else {
-                setMessage("Användarnamnet är upptaget")
+                setMessage(data.message || "Användarnamnet är upptaget");
             }
         } catch (err) {
-            console.error("Fel vid registrering", err);
+            setMessage("Fel vid registrering");
+            console.error("Fel vid registrering:", err);
         }
     };
-
 
     const handleKeyDown = (e: KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
