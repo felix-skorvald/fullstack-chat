@@ -33,7 +33,7 @@ const SendMessage = ({ receiver, update }: SendMessageProps) => {
                 value={message}
             />
             <button onClick={handleSend} disabled={message.length < 1}>
-                <img src={send} alt="" />
+                <img src={send} alt="send-icon" />
             </button>
         </div>
     );

@@ -46,7 +46,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
             const sorted = data.sort((a, b) =>
                 a.timestamp.localeCompare(b.timestamp)
             );
-            setHeaderText(chatName)
+            setHeaderText(chatName);
             setMessages(sorted);
         } catch (error) {
             console.error("Fel vid hämtning av meddelanden:", error);
@@ -66,9 +66,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
     return (
         <div className="chat-view">
             {loading ? (
-                <p>
-                    Laddar meddelanden...
-                </p>
+                <p>Laddar meddelanden...</p>
             ) : (
                 <div>
                     {messages.map((msg) => (

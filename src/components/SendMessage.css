@@ -2,6 +2,7 @@
     background-color: #414368;
     display: flex;
     justify-content: space-around;
+    gap: 0.5rem;
     position: fixed;
     bottom: 0;
     padding: 0.5rem;
