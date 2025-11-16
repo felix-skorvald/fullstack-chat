@@ -101,7 +101,10 @@ const Chat = () => {
                 <div className="stroke"></div>
 
                 {isCreating ? (
-                    <CreateNewChannel setIsCreating={setIsCreating} />
+                    <CreateNewChannel
+                        setIsCreating={setIsCreating}
+                        getAllChannels={getAllChannels}
+                    />
                 ) : (
                     <button
                         disabled={user.accessLevel !== "user"}

@@ -5,6 +5,7 @@ import SendMessage from "./SendMessage";
 import { useHeaderStore } from "../data/headerStore";
 import { deleteChannel, getChannel } from "../data/channel";
 import { useUserStore } from "../data/userStore";
+import { useNavigate } from "react-router";
 
 interface Message {
     pk: string;
@@ -41,6 +42,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
         username: useUserStore((state) => state.username),
         userId: useUserStore((state) => state.userId),
     };
+    const navigate = useNavigate();
 
     const fetchMessages = async () => {
         try {
@@ -75,6 +77,7 @@ const ChatView = ({ type, id, chatName }: ChatViewProps) => {
 
     const handleDelete = (chatID: string) => {
         deleteChannel(chatID, String(token));
+        navigate("/");
     };
 
     useEffect(() => {
